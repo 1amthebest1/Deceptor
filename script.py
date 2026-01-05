@@ -33,7 +33,7 @@ def askPermission():
 def requestSender(url):
     global TOTAL_REQUESTS, RATE_LIMITER
 
-    command = f'curl -b \"{cookies}\" -H @headers.txt "{url}" -i | grep -w "{matcher}"'
+    command = f'curl -b \"{cookies}\" -H @headers.txt "{url}" -i | grep -Fi "{matcher}"'
     result = subprocess.run(
         command,
         shell=True,
