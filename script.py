@@ -1,0 +1,113 @@
+import subprocess
+import sys
+import time
+
+#---------------------------------------------------
+print("")
+print("##################*+*##########*#**###*****#########**############")
+print("#......-#.....**......+#.....#:.....:=.....-*...#*...:..##...#..:%")
+print("#..:#...#...*##-..=*..:#...###:..+=..##:..+##...#-..+=..=#...+..:%")
+print("#..:#...#.....#-..=*==+#.....#:..-...##:..+##...#:..+=..=#......:%")
+print("#..:#...#...++#-..=#***#...++#:..--+###:..+##...#:..+=..=#..-...:%")
+print("#..:#...#...*##=..=*..:#...###:..+#####:..+##...#-..+=..=#..*...:%")
+print("#......:#.....=#.:....*#.....+:..+#####:..+##...#*......##..**..:%")
+print("%%%%#########################################################%%%%%")
+print("")
+
+# ---------------- GLOBAL VARIABLES ----------------
+
+TOTAL_REQUESTS = 0
+RATE_LIMIT = 0          # requests per second
+RATE_LIMITER = 0
+
+# ---------------- FUNCTIONS FIRST ----------------
+
+def askPermission():
+    permission = input("Do you want to start?, enter Y or N: ")
+    if permission in ('y', 'Y'):
+        return True
+    else:
+        sys.exit(0)
+
+
+def requestSender(url):
+    global TOTAL_REQUESTS, RATE_LIMITER
+
+    command = f'curl -b cookies.txt -H @headers.txt "{url}" -i | grep -w "{matcher}"'
+    result = subprocess.run(
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    TOTAL_REQUESTS += 1
+    RATE_LIMITER += 1
+
+    # ---- RATE LIMIT ----
+    if RATE_LIMITER == RATE_LIMIT:
+        time.sleep(1)
+        RATE_LIMITER = 0
+    # -------------------
+
+    if result.returncode == 1:
+        print(f"potential valid request found {url}")
+        with open('result.txt', 'a') as outfile:
+            outfile.write(f"valid request found {url}\n")
+
+
+def wordlistReaderAndRequestCaller(myUrl):
+    if wordlist in ('d', 'D'):
+        with open('wordlist.txt', 'r') as file:
+            lines = file.readlines()
+    else:
+        with open(wordlist, 'r') as file:
+            lines = file.readlines()
+
+    for line in lines:
+        payload = line.strip()
+        if not payload:
+            continue
+        requestSender(myUrl + payload)
+
+# ---------------- TAKE RATE LIMIT ----------------
+
+RATE_LIMIT = int(input("Enter rate limit (requests per second): "))
+
+# ---------------- READ HEADERS AND COOKIES ----------------
+
+pastedInFile = input("Did you put the headers and cookies in the file? (Y/N): ")
+
+if pastedInFile in ('N', 'n'):
+    cookies = input("Paste your cookies: ")
+    headers = input("Paste your headers: ")
+
+    with open('cookies.txt', 'w') as file:
+        file.write(cookies)
+
+    with open('headers.txt', 'w') as file:
+        file.write(headers)
+
+# ---------------- TAKES MATCHER, WORDLIST, AND ENDPOINT ----------------
+
+matcher = input("Enter the response header text you do not want to match: ")
+wordlist = input("Enter path for wordlist, or enter D for default: ")
+
+listOrSingle = input("Do you have a single endpoint or a list of URLs? (S/L): ")
+
+if listOrSingle in ('s', 'S'):
+    endpoint = input("Paste your endpoint: ")
+    if askPermission():
+        wordlistReaderAndRequestCaller(endpoint)
+
+else:
+    urlFilePath = input("Enter path containing list of URLs: ")
+    if askPermission():
+        with open(urlFilePath, 'r') as urlReader:
+            urls = urlReader.readlines()
+            for url in urls:
+                clean_url = url.strip()
+                if not clean_url:
+                    continue
+                wordlistReaderAndRequestCaller(clean_url)
