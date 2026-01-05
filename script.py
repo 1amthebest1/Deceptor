@@ -82,7 +82,8 @@ cookies = input("Please paste your cookies: ")
 pastedInFile = input("Did you put the headers (Y/N): ")
 
 if pastedInFile in ('N', 'n'):
-    headers = input("Paste your headers: ")
+    print("Paste headers (end with Ctrl+D on Linux/macOS or Ctrl+Z then Enter on Windows):")
+    headers = sys.stdin.read()
 
     with open('headers.txt', 'w') as file:
         file.write(headers)
