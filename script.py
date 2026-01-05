@@ -33,7 +33,7 @@ def askPermission():
 def requestSender(url):
     global TOTAL_REQUESTS, RATE_LIMITER
 
-    command = f'curl -b cookies.txt -H @headers.txt "{url}" -i | grep -w "{matcher}"'
+    command = f'curl -x http://localhost:8080 -b \"{cookies}\" -H @headers.txt "{url}" -i | grep -w "{matcher}"'
     result = subprocess.run(
         command,
         shell=True,
@@ -77,14 +77,12 @@ RATE_LIMIT = int(input("Enter rate limit (requests per second): "))
 
 # ---------------- READ HEADERS AND COOKIES ----------------
 
-pastedInFile = input("Did you put the headers and cookies in the file? (Y/N): ")
+cookies = input("Please paste your cookies: ")
+
+pastedInFile = input("Did you put the headers (Y/N): ")
 
 if pastedInFile in ('N', 'n'):
-    cookies = input("Paste your cookies: ")
     headers = input("Paste your headers: ")
-
-    with open('cookies.txt', 'w') as file:
-        file.write(cookies)
 
     with open('headers.txt', 'w') as file:
         file.write(headers)
