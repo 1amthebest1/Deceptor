@@ -31,9 +31,7 @@ def askPermission():
 
 
 def requestSender(url):
-    global TOTAL_REQUESTS, RATE_LIMITER
-
-    command = f'curl -b \"{cookies}\" -H @headers.txt "{url}" -i | grep -Fi "{matcher}"'
+    command = f'curl -b "{cookies}" -H @headers.txt "{url}" -i'
     result = subprocess.run(
         command,
         shell=True,
@@ -41,6 +39,17 @@ def requestSender(url):
         stderr=subprocess.PIPE,
         text=True
     )
+    
+    response = result.stdout
+    first_line = response.split('\n', 1)[0]
+    
+    if matcher.lower() not in response.lower():
+        if statusCode in first_line:
+            print(f"potential valid request found {url}")
+            with open('result.txt', 'a') as outfile:
+                outfile.write(f"valid request found {url}\n")
+        
+    global TOTAL_REQUESTS, RATE_LIMITER
 
     TOTAL_REQUESTS += 1
     RATE_LIMITER += 1
@@ -50,14 +59,6 @@ def requestSender(url):
         time.sleep(1)
         RATE_LIMITER = 0
     # -------------------
-    
-    response = result.stdout
-
-    if result.returncode == 1:
-        if statusCode in response.split('\n', 1)[0]:
-            print(f"potential valid request found {url}")
-            with open('result.txt', 'a') as outfile:
-                outfile.write(f"valid request found {url}\n")
 
 
 def wordlistReaderAndRequestCaller(myUrl):
@@ -95,7 +96,7 @@ if pastedInFile in ('N', 'n'):
 
 matcher = input("Enter the response header text you do not want to match: ")
 wordlist = input("Enter path for wordlist, or enter D for default: ")
-statusCode = input("Enter the status code you want to match")
+statusCode = input("Enter the status code you want to match: ")
 
 listOrSingle = input("Do you have a single endpoint or a list of URLs? (S/L): ")
 
