@@ -50,11 +50,14 @@ def requestSender(url):
         time.sleep(1)
         RATE_LIMITER = 0
     # -------------------
+    
+    response = result.stdout
 
     if result.returncode == 1:
-        print(f"potential valid request found {url}")
-        with open('result.txt', 'a') as outfile:
-            outfile.write(f"valid request found {url}\n")
+        if statusCode in response.split('\n', 1)[0]:
+            print(f"potential valid request found {url}")
+            with open('result.txt', 'a') as outfile:
+                outfile.write(f"valid request found {url}\n")
 
 
 def wordlistReaderAndRequestCaller(myUrl):
@@ -92,6 +95,7 @@ if pastedInFile in ('N', 'n'):
 
 matcher = input("Enter the response header text you do not want to match: ")
 wordlist = input("Enter path for wordlist, or enter D for default: ")
+statusCode = input("Enter the status code you want to match")
 
 listOrSingle = input("Do you have a single endpoint or a list of URLs? (S/L): ")
 
