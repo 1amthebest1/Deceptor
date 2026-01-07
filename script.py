@@ -31,6 +31,7 @@ def askPermission():
 
 
 def requestSender(url):
+    global TOTAL_REQUESTS, RATE_LIMITER
     command = f'curl -b "{cookies}" -H @headers.txt "{url}" -i'
     result = subprocess.run(
         command,
@@ -48,8 +49,6 @@ def requestSender(url):
             print(f"potential valid request found {url}")
             with open('result.txt', 'a') as outfile:
                 outfile.write(f"valid request found {url}\n")
-        
-    global TOTAL_REQUESTS, RATE_LIMITER
 
     TOTAL_REQUESTS += 1
     RATE_LIMITER += 1
