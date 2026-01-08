@@ -42,7 +42,7 @@ def requestSender(url):
         text=True
     )
     
-    print(f"sent request to ${url}")
+    print(f"sent request to {url}")
     
     response = result.stdout
     first_line = response.split('\n', 1)[0]
