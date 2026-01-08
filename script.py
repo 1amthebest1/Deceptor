@@ -47,8 +47,8 @@ def requestSender(url):
     response = result.stdout
     first_line = response.split('\n', 1)[0]
     
-    if matcher.lower() not in response.lower():
-        if statusCode in first_line:
+    if statusCode in first_line:
+        if matcher.lower() not in response.lower():
             print(f"potential valid request found {url}")
             with open('result.txt', 'a') as outfile:
                 outfile.write(f"valid request found {url}\n")
