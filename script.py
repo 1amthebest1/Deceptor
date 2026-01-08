@@ -1,3 +1,4 @@
+
 import subprocess
 import sys
 import time
@@ -40,6 +41,8 @@ def requestSender(url):
         stderr=subprocess.PIPE,
         text=True
     )
+    
+    print(f"sent request to ${url}")
     
     response = result.stdout
     first_line = response.split('\n', 1)[0]
